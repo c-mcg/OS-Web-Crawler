@@ -1,4 +1,4 @@
-# OS-Web-Crawler
+# Web-Crawler
 
 A simple web crawler
 
