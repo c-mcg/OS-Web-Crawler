@@ -30,6 +30,7 @@ public abstract class TextSearch extends Search {
      * @param caseSensitive if true matches must have the same character case as the search 
      */
     public TextSearch(String stringToFind, boolean caseSensitive) {
+    	//TODO assert stringToFind is not empty
         this.stringToFind = stringToFind;
         this.caseSensitive = caseSensitive;
     }

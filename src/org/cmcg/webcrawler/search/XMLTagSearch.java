@@ -12,14 +12,14 @@ import java.util.HashMap;
 public abstract class XMLTagSearch extends TextSearch {
     
     private enum State {
+        SEARCHING_FOR_TAG_OPENING,
         SEARCHING_FOR_TAG,
-        CHECKING_TAG,
-        CONFIRMING_TAG,
+        BUILDING_TAG,
         NEED_SPACE_TO_CONFIRM,
-        LOOKING_FOR_ATTRIBUTE,
-        BUILDING_ATTRIBUTE,
-        LOOKING_FOR_EQUAL_SIGN,
-        LOOKING_FOR_ATTRIBUTE_VALUE,
+        SEARCHING_FOR_ATTRIBUTE_NAME,
+        BUILDING_ATTRIBUTE_NAME,
+        SEARCHING_FOR_EQUAL_SIGN,
+        SEARCHING_FOR_ATTRIBUTE_VALUE,
         BUILDING_ATTRIBUTE_VALUE,
     }
     
@@ -47,7 +47,7 @@ public abstract class XMLTagSearch extends TextSearch {
     public abstract void onFoundTag(HashMap<String, String> attributes, String tagContents);
     
     private void resetSearch() {
-        state = State.SEARCHING_FOR_TAG;
+        state = State.SEARCHING_FOR_TAG_OPENING;
         tagConfirmed = false;
         inQuotes = false;
         inDoubleQuotes = false;
@@ -64,46 +64,59 @@ public abstract class XMLTagSearch extends TextSearch {
     @Override
     public boolean processChar(char c) {
         switch(state) {
-            case SEARCHING_FOR_TAG:
-                if (c == '<') {//Found a tag to check
-                    state = State.CHECKING_TAG;
+            case SEARCHING_FOR_TAG_OPENING:
+            	
+            	//Look for the opening of a tag
+                if (c == '<') {
+                    state = State.SEARCHING_FOR_TAG;
                 }
+                
+                //Continue otherwise
+                
                 break;
                 
-            case CHECKING_TAG:
-                if (c == '>') {//Didn't find the tag
+            case SEARCHING_FOR_TAG:
+            	
+            	//Reset if we found the closing bracket but no tag
+                if (c == '>') {
                     resetSearch();
                     break;
                 }
-                if (super.processChar(c)) {//Search for the start of a match
-                    state = State.CONFIRMING_TAG;
-                }
-                super.numCharsProcessed--;//To counteract super.processChar
-                break;
                 
-            case CONFIRMING_TAG://Confirm the rest of the match
-                if (super.processChar(c) ||
-                    (stringToFind.length() == 1 && Character.isWhitespace(c))) {
-                    if (tagConfirmed) {
-                        state = State.LOOKING_FOR_ATTRIBUTE;
-                    }
+                //Preemptively set this because processChar may change the state
+                //This switch will happen if we found the first letter, and the tag length is greater than 1
+                state = State.BUILDING_TAG;
+                
+                //Cancel the preemptive state switch if we didn't find anything
+                //This will switch the state to SEARCHING_FOR_ATTRIBUTE_NAME if the tag is 1 letter and if found
+                if (!super.processChar(c)) {
+                    state = State.SEARCHING_FOR_TAG;
+                }
+                
+                //TODO this is to counteract TextSearch.processChar, but really we shouldn't be adding here if we don't need
+                super.numCharsProcessed--;//To counteract super.processChar
+                
+                break;
+            
+            //We have found the opening bracket, and the first letter of the tag
+            //We know the length of the tag is more than 1
+            case BUILDING_TAG:
+            	
+            	//Continue looking for the tag
+                if (super.processChar(c)) {
+                	
                 } else if (c == '>') {
                     resetSearch();
                 } else {
-                    state = State.CHECKING_TAG;
+                    state = State.SEARCHING_FOR_TAG;
                 }
-                super.numCharsProcessed--;//To counteract super.processChar
-                break;
                 
-            case NEED_SPACE_TO_CONFIRM:
-                if (Character.isWhitespace(c)) {
-                    state = State.LOOKING_FOR_ATTRIBUTE;
-                    break;
-                }
-                state = State.CHECKING_TAG;
+                //To counteract super.processChar
+                super.numCharsProcessed--;//To counteract super.processChar
+                
                 break;
             
-            case LOOKING_FOR_ATTRIBUTE:
+            case SEARCHING_FOR_ATTRIBUTE_NAME:
                 if (c == '>') {
                     submitSearch();
                 }
@@ -111,15 +124,15 @@ public abstract class XMLTagSearch extends TextSearch {
                     break;
                 }
                 attributeName.append(c);
-                state = State.BUILDING_ATTRIBUTE;
+                state = State.BUILDING_ATTRIBUTE_NAME;
                 break;
                 
-            case BUILDING_ATTRIBUTE:
+            case BUILDING_ATTRIBUTE_NAME:
                 if (c == '>') {
                     submitSearch();
                 }
                 if (Character.isWhitespace(c)) {
-                    state = State.LOOKING_FOR_EQUAL_SIGN;
+                    state = State.SEARCHING_FOR_EQUAL_SIGN;
                     break;
                 }
                 if (c == '=') {
@@ -129,7 +142,7 @@ public abstract class XMLTagSearch extends TextSearch {
                 attributeName.append(c);
                 break;
                 
-            case LOOKING_FOR_EQUAL_SIGN:
+            case SEARCHING_FOR_EQUAL_SIGN:
                 if (c == '>') {
                     submitSearch();
                 }
@@ -137,15 +150,15 @@ public abstract class XMLTagSearch extends TextSearch {
                     break;
                 }
                 if (c == '=') {
-                    state = State.LOOKING_FOR_ATTRIBUTE_VALUE;
+                    state = State.SEARCHING_FOR_ATTRIBUTE_VALUE;
                     break;
                 }
                 attributeName = new StringBuilder();
                 attributeName.append(c);
-                state = State.BUILDING_ATTRIBUTE;
+                state = State.BUILDING_ATTRIBUTE_NAME;
                 break;
                 
-            case LOOKING_FOR_ATTRIBUTE_VALUE:
+            case SEARCHING_FOR_ATTRIBUTE_VALUE:
                 if (c == '>') {
                     submitSearch();
                 }
@@ -183,7 +196,7 @@ public abstract class XMLTagSearch extends TextSearch {
                     tagAttributes.put(attributeName.toString(), attributeValue.toString());
                     attributeName = new StringBuilder();
                     attributeValue = new StringBuilder();
-                    state = State.LOOKING_FOR_ATTRIBUTE;
+                    state = State.SEARCHING_FOR_ATTRIBUTE_NAME;
                 }
                 if (c == '>') {
                     submitSearch();
@@ -208,7 +221,14 @@ public abstract class XMLTagSearch extends TextSearch {
     
     @Override
     public void onFoundString(String matchedString, int characterIndex) {
-        tagConfirmed = true;
+        switch(state) {
+        
+	        case SEARCHING_FOR_TAG:
+	        case BUILDING_TAG:
+	        	state = State.SEARCHING_FOR_ATTRIBUTE_NAME;
+	        	break;
+        
+        }
     }
 
 }
