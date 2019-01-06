@@ -1,5 +1,5 @@
 /*
-* Connor McG
+* Nik M
 * https://github.com/c-mcg/Web-Crawler
 */
 package org.cmcg.webcrawler.search;
