@@ -1,6 +1,6 @@
 /*
 * Nik M
-* https://github.com/c-mcg/Web-Crawler
+* https://github.com/nik-m2/Web-Crawler
 */
 package org.cmcg.webcrawler;
 
