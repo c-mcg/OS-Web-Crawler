@@ -1,8 +1,8 @@
 /*
 * Nik M
-* https://github.com/c-mcg/Web-Crawler
+* https://github.com/nik-m2/Web-Crawler
 */
-package org.cmcg.webcrawler.search;
+package org.nikm.webcrawler.search;
 
 /**
  * A Search object that searches for text

@@ -1,8 +1,8 @@
 /*
 * Nik M
-* https://github.com/c-mcg/Web-Crawler
+* https://github.com/nik-m2/Web-Crawler
 */
-package org.cmcg.webcrawler;
+package org.nikm.webcrawler;
 
 import java.io.IOException;
 import java.net.SocketException;
@@ -11,9 +11,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 
-import org.cmcg.logger.Log;
-import org.cmcg.webcrawler.search.Search;
-import org.cmcg.webcrawler.search.XMLTagSearch;
+import org.nikm.logger.Log;
+import org.nikm.webcrawler.search.Search;
+import org.nikm.webcrawler.search.XMLTagSearch;
 
 public class WebCrawler {
 

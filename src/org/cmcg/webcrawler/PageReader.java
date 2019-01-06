@@ -1,8 +1,8 @@
 /*
 * Nik M
-* https://github.com/c-mcg/Web-Crawler
+* https://github.com/nik-m2/Web-Crawler
 */
-package org.cmcg.webcrawler;
+package org.nikm.webcrawler;
 
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
@@ -12,8 +12,8 @@ import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-import org.cmcg.logger.Log;
-import org.cmcg.webcrawler.search.Search;
+import org.nikm.logger.Log;
+import org.nikm.webcrawler.search.Search;
 
 public class PageReader {
     

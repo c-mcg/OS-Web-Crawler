@@ -1,8 +1,8 @@
 /*
 * Nik M
-* https://github.com/c-mcg/Web-Crawler
+* https://github.com/nik-m2/Web-Crawler
 */
-package org.cmcg.webcrawler.search;
+package org.nikm.webcrawler.search;
 
 import java.awt.Image;
 import java.awt.image.BufferedImage;
@@ -17,7 +17,7 @@ import java.util.HashMap;
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 
-import org.cmcg.logger.Log;
+import org.nikm.logger.Log;
 
 /**
  * A search object that searches for 'img' tags and compares the image to local images.
